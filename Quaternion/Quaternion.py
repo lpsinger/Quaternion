@@ -36,6 +36,125 @@ Quaternion provides a class for manipulating quaternion objects.  This class pro
 
 import numpy as np
 from math import cos, sin, radians, degrees, atan2, sqrt
+import numba
+
+
+@numba.jit(nopython=True)
+def _quat2equatorial(q):
+    """
+    Determine Right Ascension, Declination, and Roll for the object quaternion
+
+    :returns: RA, Dec, Roll
+    :rtype: numpy array [ra,dec,roll]
+    """
+
+    q2 = q**2
+
+    # calculate direction cosine matrix elements from $quaternions
+    xa = q2[0] - q2[1] - q2[2] + q2[3]
+    xb = 2 * (q[0] * q[1] + q[2] * q[3])
+    xn = 2 * (q[0] * q[2] - q[1] * q[3])
+    yn = 2 * (q[1] * q[2] + q[0] * q[3])
+    zn = q2[3] + q2[2] - q2[0] - q2[1]
+
+    # Due to numerical precision this can go negative.  Allow *slightly* negative
+    # values but raise an exception otherwise.
+    one_minus_xn2 = 1 - xn**2
+    if one_minus_xn2 < 0:
+    #    if one_minus_xn2 < -1e-12:
+    #        raise ValueError('Unexpected negative norm: {}'.format(one_minus_xn2))
+        one_minus_xn2 = 0
+
+    # ; calculate RA, Dec, Roll from cosine matrix elements
+    ra = degrees(atan2(xb, xa))
+    dec = degrees(atan2(xn, sqrt(one_minus_xn2)))
+    roll = degrees(atan2(yn, zn))
+    if (ra < 0):
+        ra += 360
+    if (roll < 0):
+        roll += 360
+
+    return np.array([ra, dec, roll])
+
+
+@numba.jit(nopython=True)
+def _quat2transform(q):
+    """
+    Transform a unit quaternion into its corresponding rotation matrix (to
+    be applied on the right side).
+
+    :returns: transform matrix
+    :rtype: numpy array
+
+    """
+    x, y, z, w = q
+    xx2 = 2 * x * x
+    yy2 = 2 * y * y
+    zz2 = 2 * z * z
+    xy2 = 2 * x * y
+    wz2 = 2 * w * z
+    zx2 = 2 * z * x
+    wy2 = 2 * w * y
+    yz2 = 2 * y * z
+    wx2 = 2 * w * x
+
+    rmat = np.empty((3, 3), float)
+    rmat[0, 0] = 1. - yy2 - zz2
+    rmat[0, 1] = xy2 - wz2
+    rmat[0, 2] = zx2 + wy2
+    rmat[1, 0] = xy2 + wz2
+    rmat[1, 1] = 1. - xx2 - zz2
+    rmat[1, 2] = yz2 - wx2
+    rmat[2, 0] = zx2 - wy2
+    rmat[2, 1] = yz2 + wx2
+    rmat[2, 2] = 1. - xx2 - yy2
+
+    return rmat
+
+
+@numba.jit(nopython=True)
+def _transform2quat(T):
+    """Construct quaternion from the transform/rotation matrix
+
+    :returns: quaternion formed from transform matrix
+    :rtype: numpy array
+    """
+
+    # Code was copied from perl PDL code that uses backwards index ordering
+    den = np.array([1.0 + T[0, 0] - T[1, 1] - T[2, 2],
+                    1.0 - T[0, 0] + T[1, 1] - T[2, 2],
+                    1.0 - T[0, 0] - T[1, 1] + T[2, 2],
+                    1.0 + T[0, 0] + T[1, 1] + T[2, 2]])
+
+    #max_idx = np.flatnonzero(den == max(den))[0]
+    max_idx = 0
+    max_x = den[0]
+    for i in range(den.shape[0]):
+        if den[i] > max_x:
+            max_x = den[i]
+            max_idx = i
+
+    q = np.zeros(4)
+    q[max_idx] = 0.5 * sqrt(max_x)
+    denom = 4.0 * q[max_idx]
+    if (max_idx == 0):
+        q[1] = (T[1, 0] + T[0, 1]) / denom
+        q[2] = (T[2, 0] + T[0, 2]) / denom
+        q[3] = -(T[2, 1] - T[1, 2]) / denom
+    if (max_idx == 1):
+        q[0] = (T[1, 0] + T[0, 1]) / denom
+        q[2] = (T[2, 1] + T[1, 2]) / denom
+        q[3] = -(T[0, 2] - T[2, 0]) / denom
+    if (max_idx == 2):
+        q[0] = (T[2, 0] + T[0, 2]) / denom
+        q[1] = (T[2, 1] + T[1, 2]) / denom
+        q[3] = -(T[1, 0] - T[0, 1]) / denom
+    if (max_idx == 3):
+        q[0] = -(T[2, 1] - T[1, 2]) / denom
+        q[1] = -(T[0, 2] - T[2, 0]) / denom
+        q[2] = -(T[1, 0] - T[0, 1]) / denom
+
+    return q
 
 
 class Quat(object):
@@ -278,35 +397,7 @@ class Quat(object):
         :returns: RA, Dec, Roll
         :rtype: numpy array [ra,dec,roll]
         """
-
-        q = self.q
-        q2 = self.q**2
-
-        # calculate direction cosine matrix elements from $quaternions
-        xa = q2[0] - q2[1] - q2[2] + q2[3]
-        xb = 2 * (q[0] * q[1] + q[2] * q[3])
-        xn = 2 * (q[0] * q[2] - q[1] * q[3])
-        yn = 2 * (q[1] * q[2] + q[0] * q[3])
-        zn = q2[3] + q2[2] - q2[0] - q2[1]
-
-        # Due to numerical precision this can go negative.  Allow *slightly* negative
-        # values but raise an exception otherwise.
-        one_minus_xn2 = 1 - xn**2
-        if one_minus_xn2 < 0:
-            if one_minus_xn2 < -1e-12:
-                raise ValueError('Unexpected negative norm: {}'.format(one_minus_xn2))
-            one_minus_xn2 = 0
-
-        # ; calculate RA, Dec, Roll from cosine matrix elements
-        ra = degrees(atan2(xb, xa))
-        dec = degrees(atan2(xn, sqrt(one_minus_xn2)))
-        roll = degrees(atan2(yn, zn))
-        if (ra < 0):
-            ra += 360
-        if (roll < 0):
-            roll += 360
-
-        return np.array([ra, dec, roll])
+        return _quat2equatorial(self._q)
 
 
 #  _quat2transform is largely from Enthought's quaternion.rotmat, though this math is
@@ -351,6 +442,7 @@ class Quat(object):
         :rtype: numpy array
 
         """
+        #return _quat2transform(self.q)
         x, y, z, w = self.q
         xx2 = 2 * x * x
         yy2 = 2 * y * y
@@ -417,35 +509,7 @@ class Quat(object):
         """
 
         # Code was copied from perl PDL code that uses backwards index ordering
-        T = self.transform.transpose()
-        den = np.array([1.0 + T[0, 0] - T[1, 1] - T[2, 2],
-                        1.0 - T[0, 0] + T[1, 1] - T[2, 2],
-                        1.0 - T[0, 0] - T[1, 1] + T[2, 2],
-                        1.0 + T[0, 0] + T[1, 1] + T[2, 2]])
-
-        max_idx = np.flatnonzero(den == max(den))[0]
-
-        q = np.zeros(4)
-        q[max_idx] = 0.5 * sqrt(max(den))
-        denom = 4.0 * q[max_idx]
-        if (max_idx == 0):
-            q[1] = (T[1, 0] + T[0, 1]) / denom
-            q[2] = (T[2, 0] + T[0, 2]) / denom
-            q[3] = -(T[2, 1] - T[1, 2]) / denom
-        if (max_idx == 1):
-            q[0] = (T[1, 0] + T[0, 1]) / denom
-            q[2] = (T[2, 1] + T[1, 2]) / denom
-            q[3] = -(T[0, 2] - T[2, 0]) / denom
-        if (max_idx == 2):
-            q[0] = (T[2, 0] + T[0, 2]) / denom
-            q[1] = (T[2, 1] + T[1, 2]) / denom
-            q[3] = -(T[1, 0] - T[0, 1]) / denom
-        if (max_idx == 3):
-            q[0] = -(T[2, 1] - T[1, 2]) / denom
-            q[1] = -(T[0, 2] - T[2, 0]) / denom
-            q[2] = -(T[1, 0] - T[0, 1]) / denom
-
-        return q
+        return _transform2quat(self.transform.transpose())
 
     def __div__(self, quat2):
         """
