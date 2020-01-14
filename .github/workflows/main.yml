@@ -5,14 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Package building
     steps:
-    # To use this repository's private action, you must check out the repository
-    - name: Checkout
-      uses: actions/checkout@v1
     - name: setup
       run: |
-        sed -e 's/${CONDA_USER_PASSWORD}@/${{ secrets.CONDA_USER_PASSWORD }}/g' condarc > condarc.2
-        mv condarc.2 condarc
-        cat condarc
         echo ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }} > gdrive_credentials.json
         chmod 600 gdrive_credentials.json
     - name: build
