@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: setup
       run: |
-        echo ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }} > gdrive_credentials.json
+        echo "${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}" > gdrive_credentials.json
         chmod 600 gdrive_credentials.json
     - name: build
       id: build
