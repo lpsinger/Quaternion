@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build-package:
     runs-on: ubuntu-latest
-    name: Package building
+    name: Conda Package (Linux)
     steps:
     - name: build
       id: build
