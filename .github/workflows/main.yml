@@ -17,7 +17,7 @@ jobs:
         chmod 600 gdrive_credentials.json
     - name: build
       id: build
-      uses: sot/skare3/actions/build@master
+      uses: sot/skare3/actions/build@gh-actions
       with:
         package: 'Quaternion'
       env:
