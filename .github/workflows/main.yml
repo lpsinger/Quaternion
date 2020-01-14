@@ -19,6 +19,6 @@ jobs:
       id: upload
       with:
         files: builds/linux-64 builds/noarch
-        directory: ska-ci
+        directory: ska-ci/conda-test
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
