@@ -11,6 +11,7 @@ jobs:
       with:
         package: 'Quaternion'
       env:
+        CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
