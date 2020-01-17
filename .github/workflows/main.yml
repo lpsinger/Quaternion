@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Conda Package (Linux)
     steps:
-    - name: build
+    - name: Build
       id: build
       uses: sot/skare3/actions/build@gh-actions
       with:
@@ -15,7 +15,7 @@ jobs:
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
     - uses: sot/skare3/actions/gdrive_upload@gh-actions
-      name: upload
+      name: Upload to Google Drive
       id: upload
       with:
         files: builds/linux-64 builds/noarch
