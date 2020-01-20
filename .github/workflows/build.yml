@@ -6,11 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Build on Linux
     steps:
+    - name: Login to GitHub Package Registry
+      run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull Docker image
+      run: docker pull docker.pkg.github.com/sot/skare3/centos5-builder:latest
     - name: Build
       id: build
-      uses: sot/skare3/actions/build@gh-actions
-      with:
-        package: 'Quaternion'
+      run: |
+        docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
@@ -38,20 +41,21 @@ jobs:
         path: skare3
     - name: Build
       run: |
-        sed -e "s/\${CONDA_PASSWORD}/${CONDA_PASSWORD}/g" ./skare3/actions/build/files/condarc > $HOME/.condarc
-        curl -O https://repo.continuum.io/miniconda/Miniconda3-4.3.21-MacOSX-x86_64.sh
-        bash Miniconda3-4.3.21-MacOSX-x86_64.sh -b
-        export PATH=${HOME}/miniconda3/bin:$PATH
-        conda install python=3.6.2 conda=4.3.21 -q --yes
-        conda install ska3_builder -q --yes
-        cd skare3
-        ./ska_builder.py --tag master --force Quaternion
-        ls -R builds
+        source ./skare3/actions/build/files/setup_conda.sh
+        source ./skare3/actions/build/files/build.sh ${GITHUB_REPOSITORY}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_ASKPASS: skare3/actions/build/files/git_pass.py
         GIT_USER: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+    - uses: sot/skare3/actions/gdrive_upload@gh-actions
+      name: Upload to Google Drive
+      id: upload
+      with:
+        files: builds/osx-64 builds/noarch
+        directory: ska-ci/conda-test
+      env:
+        GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
 
   Build-windows:
