@@ -48,6 +48,12 @@ jobs:
         GIT_ASKPASS: skare3/actions/build/files/git_pass.py
         GIT_USER: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+    - name: Upload to Google Drive
+      run: |
+        pip install --user google-api-python-client
+        ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
+      env:
+        GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
 
   Build-windows:
