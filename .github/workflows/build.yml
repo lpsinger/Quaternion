@@ -51,6 +51,8 @@ jobs:
     - name: Upload to Google Drive
       run: |
         pip3 install --user google-api-python-client
+        echo setting credentials at $GOOGLE_APPLICATION_CREDENTIALS
+        echo "${GOOGLE_DRIVE_CREDENTIALS}" > $GOOGLE_APPLICATION_CREDENTIALS
         ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
