@@ -21,7 +21,6 @@ jobs:
         GIT_ASKPASS: /home/aca/git_pass.py
     - uses: sot/skare3/actions/gdrive_upload@gh-actions
       name: Upload to Google Drive
-      id: upload
       with:
         files: builds/linux-64 builds/noarch
         directory: ska-ci/conda-test
@@ -56,6 +55,7 @@ jobs:
         ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: /github/workspace/gdrive_credentials.json
 
 
   Build-windows:
