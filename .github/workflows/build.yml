@@ -23,7 +23,7 @@ jobs:
       name: Upload to Google Drive
       with:
         files: builds/linux-64 builds/noarch
-        directory: ska-ci/conda-test
+        directory: ska3/conda-test --drive cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
@@ -51,7 +51,7 @@ jobs:
       run: |
         echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
         pip3 install --user google-api-python-client
-        ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
+        ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska3/conda-test --drive cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
