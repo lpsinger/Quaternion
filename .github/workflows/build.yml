@@ -2,8 +2,6 @@ on: [push]
 name: Conda build
 
 jobs:
-
-
   build-macos:
     runs-on: macos-latest
     name: Build on Mac OS
@@ -25,9 +23,11 @@ jobs:
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
     - name: Upload to Google Drive
       run: |
-        echo ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }} > ${HOME}/gdrive_credentials.json
+        echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
         pip3 install --user google-api-python-client
         ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
+      env:
+        GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
 
   build-windows:
