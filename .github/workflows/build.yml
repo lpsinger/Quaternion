@@ -49,15 +49,14 @@ jobs:
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
     - name: Upload to Google Drive
       run: |
+        echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
         pip3 install --user google-api-python-client
-        chmod +x ./skare3/actions/gdrive_upload/upload.sh
-        ./skare3/actions/gdrive_upload/upload.sh upload builds/osx-64 builds/noarch ska-ci/conda-test
+        ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska-ci/conda-test
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-        GOOGLE_APPLICATION_CREDENTIALS: ${GITHUB_WORKSPACE}/gdrive_credentials.json
 
 
-  Build-windows:
+  build-windows:
     runs-on: windows-latest
     name: Build on Windows
     steps:
