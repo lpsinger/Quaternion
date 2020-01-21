@@ -2,6 +2,32 @@ on: [push]
 name: Conda build
 
 jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Build on Linux
+    steps:
+    - name: Login to GitHub Package Registry
+      run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull Docker image
+      run: docker pull docker.pkg.github.com/sot/skare3/centos5-builder:latest
+    - name: Build
+      id: build
+      run: |
+        docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY}
+      env:
+        CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
+        GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+        GIT_ASKPASS: /home/aca/git_pass.py
+    - uses: sot/skare3/actions/gdrive_upload@gh-actions
+      name: Upload to Google Drive
+      with:
+        files: builds/linux-64 builds/noarch
+        directory: ska-ci/conda-test
+      env:
+        GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
+
+
   build-macos:
     runs-on: macos-latest
     name: Build on Mac OS
@@ -32,7 +58,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    name: Build on Windows
+    name: Build on Windows (skeleton)
     steps:
     - name: Fetch Skare3
       uses: actions/checkout@v2
