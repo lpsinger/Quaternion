@@ -60,12 +60,12 @@ jobs:
     runs-on: windows-latest
     name: Build on Windows (skeleton)
     steps:
-    - name: Fetch Skare3
+    - name: Fetch Skare3 Tools
       uses: actions/checkout@v2
       with:
-        repository: sot/skare3
-        ref: gh-actions
-        path: skare3
+        repository: sot/skare3_tools
+        ref: first_try
+        path: skare3_tools
     - name: Build
       run: |
         dir
