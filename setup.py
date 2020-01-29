@@ -19,5 +19,8 @@ setup(name='Quaternion',
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       zip_safe=False,
       tests_require=['pytest'],
+      install_requires=['google-api-python-client',
+                        'google-auth-oauthlib',
+                        'setuptools_scm'],
       cmdclass=cmdclass,
       )

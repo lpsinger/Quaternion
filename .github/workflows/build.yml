@@ -19,11 +19,11 @@ jobs:
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
-    - uses: sot/skare3/actions/gdrive_upload@gh-actions
+    - uses: sot/skare3_tools/actions/gdrive_upload@first_try
       name: Upload to Google Drive
       with:
         files: builds/linux-64 builds/noarch
-        directory: ska3/conda-test --drive cxc_ops
+        directory: /ska3/conda-test --drive cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
@@ -32,26 +32,26 @@ jobs:
     runs-on: macos-latest
     name: Build on Mac OS
     steps:
-    - name: Fetch Skare3
+    - name: Fetch Skare3 Tools
       uses: actions/checkout@v2
       with:
-        repository: sot/skare3
+        repository: sot/skare3_tools
         ref: gh-actions
-        path: skare3
+        path: skare3_tools
     - name: Build
       run: |
-        source ./skare3/actions/build/files/setup_conda.sh
-        source ./skare3/actions/build/files/build.sh ${GITHUB_REPOSITORY}
+        source ./skare3_tools/actions/build/files/setup_conda.sh
+        source ./skare3_tools/actions/build/files/build.sh ${GITHUB_REPOSITORY}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
-        GIT_ASKPASS: skare3/actions/build/files/git_pass.py
+        GIT_ASKPASS: skare3_tools/actions/build/files/git_pass.py
         GIT_USER: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
     - name: Upload to Google Drive
       run: |
         echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
-        pip3 install --user google-api-python-client
-        ./skare3/actions/gdrive_upload/gdrive.py upload builds/osx-64 builds/noarch ska3/conda-test --drive cxc_ops
+        pip3 install --user ./skare3_tools
+        gdrive upload ./builds/osx-64 ./builds/noarch /ska3/conda-test --drive cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
@@ -63,9 +63,9 @@ jobs:
     - name: Fetch Skare3
       uses: actions/checkout@v2
       with:
-        repository: sot/skare3
+        repository: sot/skare3_tools
         ref: gh-actions
-        path: skare3
+        path: skare3_tools
     - name: Build
       run: |
         dir
