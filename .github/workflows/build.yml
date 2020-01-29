@@ -13,7 +13,7 @@ jobs:
     - name: Build
       id: build
       run: |
-        docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY}
+        docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_SHA}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
@@ -41,7 +41,7 @@ jobs:
     - name: Build
       run: |
         source ./skare3_tools/actions/build/files/setup_conda.sh
-        source ./skare3_tools/actions/build/files/build.sh ${GITHUB_REPOSITORY}
+        source ./skare3_tools/actions/build/files/build.sh ${GITHUB_SHA}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_ASKPASS: skare3_tools/actions/build/files/git_pass.py
@@ -50,6 +50,7 @@ jobs:
     - name: Upload to Google Drive
       run: |
         echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
+        export PATH=`python3 -c 'import site; print(site.USER_BASE)'`:$PATH
         pip3 install --user ./skare3_tools
         gdrive upload ./builds/osx-64 ./builds/noarch /ska3/conda-test --drive cxc_ops
       env:
