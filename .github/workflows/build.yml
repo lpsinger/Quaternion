@@ -50,7 +50,7 @@ jobs:
     - name: Upload to Google Drive
       run: |
         echo ${GOOGLE_DRIVE_CREDENTIALS} > ${HOME}/gdrive_credentials.json
-        export PATH=`python3 -c 'import site; print(site.USER_BASE)'`:$PATH
+        export PATH=`python3 -c 'import site; print(site.USER_BASE)'`/bin:$PATH
         pip3 install --user ./skare3_tools
         gdrive upload ./builds/osx-64 ./builds/noarch /ska3/conda-test --drive cxc_ops
       env:
