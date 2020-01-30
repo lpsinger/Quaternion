@@ -12,8 +12,7 @@ jobs:
       run: docker pull docker.pkg.github.com/sot/skare3/centos5-builder:latest
     - name: Build
       id: build
-      run: |
-        docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY} --tag ${GITHUB_SHA}
+      run: docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY} --tag ${GITHUB_SHA}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
