@@ -9,7 +9,7 @@ jobs:
     - name: Login to GitHub Package Registry
       run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Docker image
-      run: docker pull docker.pkg.github.com/sot/skare3/centos5-builder:latest
+      run: docker pull docker.pkg.github.com/sot/skare3/centos5-builder:v2
     - name: Build
       id: build
       run: docker run --rm  --name builder -v $GITHUB_WORKSPACE:/github/workspace -w /github/workspace  -e CONDA_PASSWORD -e GIT_USERNAME -e GIT_PASSWORD  --entrypoint /home/ska/build-pkg.sh docker.pkg.github.com/sot/skare3/centos5-builder:latest ${GITHUB_REPOSITORY} --tag ${GITHUB_SHA}
