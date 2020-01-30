@@ -27,7 +27,7 @@ jobs:
       with:
         files: builds/linux-64 builds/noarch
         directory: /ska3/conda-test
-        options: --drive cxc_ops
+        options: --drive=cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
