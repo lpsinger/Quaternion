@@ -25,7 +25,9 @@ jobs:
     - uses: sot/skare3_tools/actions/gdrive_upload@first_try
       name: Upload to Google Drive
       with:
-        files: builds/linux-64 builds/noarch
+        files: |
+          builds/linux-64
+          builds/noarch
         directory: /ska3/conda-test
         options: --drive=cxc_ops
       env:
