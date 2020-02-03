@@ -22,7 +22,7 @@ jobs:
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
-    - uses: sot/skare3_tools/actions/gdrive_upload@first_try
+    - uses: sot/skare3_tools/actions/gdrive_upload
       name: Upload to Google Drive
       with:
         files: |
@@ -42,7 +42,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: sot/skare3_tools
-        ref: first_try
+        ref: master
         path: skare3_tools
     - name: Build
       run: |
@@ -60,18 +60,3 @@ jobs:
         gdrive --batch upload ./builds/osx-64 ./builds/noarch /ska3/conda-test --drive cxc_ops
       env:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-
-
-  build-windows:
-    runs-on: windows-latest
-    name: Build on Windows (skeleton)
-    steps:
-    - name: Fetch Skare3
-      uses: actions/checkout@v2
-      with:
-        repository: sot/skare3_tools
-        ref: first_try
-        path: skare3_tools
-    - name: Build
-      run: |
-        dir
