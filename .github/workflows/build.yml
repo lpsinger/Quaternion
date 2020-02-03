@@ -28,7 +28,7 @@ jobs:
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
-    - uses: sot/skare3_tools/actions/gdrive_upload
+    - uses: sot/skare3_tools/actions/gdrive_upload@master
       name: Upload to Google Drive
       with:
         files: |
