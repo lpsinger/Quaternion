@@ -1,5 +1,11 @@
-on: [push]
 name: Conda build
+on:
+  push:
+    branches:
+    - master
+  release:
+    types:
+      - created
 
 jobs:
   build-linux:
