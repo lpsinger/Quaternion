@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - gh-actions
   release:
     types:
     - created
