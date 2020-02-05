@@ -25,7 +25,7 @@ jobs:
         ${GITHUB_REPOSITORY} --tag ${GITHUB_SHA}
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
-        GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        GIT_USERNAME: chandra-xray
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
         GIT_ASKPASS: /home/aca/git_pass.py
     - uses: sot/skare3_tools/actions/gdrive_upload@master
@@ -57,7 +57,7 @@ jobs:
       env:
         CONDA_PASSWORD: ${{ secrets.CONDA_PASSWORD }}
         GIT_ASKPASS: skare3_tools/actions/build/files/git_pass.py
-        GIT_USER: ${{ secrets.GIT_USERNAME }}
+        GIT_USER: chandra-xray
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
     - name: Upload to Google Drive
       run: |
