@@ -44,4 +44,3 @@ jobs:
         GOOGLE_DRIVE_CREDENTIALS: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
 
 
-
