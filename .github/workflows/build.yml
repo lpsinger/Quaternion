@@ -37,7 +37,7 @@ jobs:
       with:
         files: |
           builds/linux-64
-          builds/noarch"
+          builds/noarch
         directory: /ska3/conda-test
         options: --drive=cxc_ops
       env:
