@@ -36,8 +36,8 @@ jobs:
       name: Upload to Google Drive
       with:
         files:
-          - builds/linux-64
-          - builds/noarch
+        - builds/linux-64
+        - builds/noarch
         directory: /ska3/conda-test
         options: --drive=cxc_ops
       env:
