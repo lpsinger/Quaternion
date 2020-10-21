@@ -1,9 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import ska_helpers
 
 from .Quaternion import *
 
-__version__ = ska_helpers.get_version(__package__)
+__version__ = '3.5.2'
 
 
 def test(*args, **kwargs):
